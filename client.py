@@ -6,7 +6,7 @@ from PyQt5.QtCore import QSize
 class UdpClient:
     def __init__(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.client_socket.settimeout(1.0)
+        self.client_socket.settimeout(2.0)
 
     def send_message(self, _message, _addr):
         start = time.time()
@@ -20,9 +20,9 @@ class UdpClient:
             data = int.from_bytes(data, 'big')
             end = time.time()
             elapsed = end - start
-            print(f'Recieved response:{data} in {elapsed}s')
+            return f'{data} in {elapsed}s'
         except socket.timeout:
-            print('REQUEST TIMED OUT')
+            return 'REQUEST TIMED OUT'
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -34,13 +34,15 @@ class MainWindow(QMainWindow):
         
     def setup_ui(self):
         self.setWindowTitle('UDP Client')
-        self.setMinimumSize(QSize(480, 80))
+        self.setMinimumSize(QSize(480, 100))
 
         self.value_label = QLabel('Enter a number to send to the server', self)
         self.value_input = QLineEdit(self)
 
         self.address_label = QLabel('Enter the server address', self)
         self.address_input = QLineEdit(self)
+
+        self.result_label = QLabel('Result: ', self)
         
         self.button = QPushButton('Send', self)
         self.button.clicked.connect(self.on_click)
@@ -50,6 +52,7 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.value_input)
         self.layout.addWidget(self.address_label)
         self.layout.addWidget(self.address_input)
+        self.layout.addWidget(self.result_label)
         self.layout.addWidget(self.button)
 
         container = QWidget()
@@ -59,7 +62,8 @@ class MainWindow(QMainWindow):
     def on_click(self):
         value = int(self.value_input.text())
         address = self.address_input.text()
-        self.client.send_message(value, address)
+        result = self.client.send_message(value, address)
+        self.result_label.setText(f'Result: {result}')
 
 
 
