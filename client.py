@@ -7,13 +7,14 @@ class UdpClient:
     def __init__(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.client_socket.settimeout(1.0)
-        self.message = 2
-        self.addr = ("127.0.0.1", 12000)
 
-    def send_message(self):
+    def send_message(self, _message, _addr):
         start = time.time()
 
-        self.client_socket.sendto(self.message.to_bytes(2, 'big'), self.addr)
+        addr = (_addr, 12000)
+        message = _message.to_bytes(2, 'big')
+
+        self.client_socket.sendto(message, addr)
         try:
             data, server = self.client_socket.recvfrom(1024)
             data = int.from_bytes(data, 'big')
@@ -56,7 +57,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
     
     def on_click(self):
-        self.client.send_message()
+        value = int(self.value_input.text())
+        address = self.address_input.text()
+        self.client.send_message(value, address)
 
 
 
