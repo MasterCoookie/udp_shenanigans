@@ -87,10 +87,12 @@ class MainWindow(QMainWindow):
         self.thred.started.connect(self.client.send_message)
         self.thred.finished.connect(self.on_finished)
         self.thred.finished.connect(self.thred.deleteLater)
+
+        self.client.finished.connect(self.thred.quit)
+
         self.thred.start()
 
         
-        self.client.finished.connect(self.thred.quit)
         self.client.finished.connect(self.client.deleteLater)
 
     
