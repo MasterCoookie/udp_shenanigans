@@ -1,4 +1,5 @@
 import socket
+import time
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.bind(('', 12000))
@@ -8,3 +9,4 @@ while True:
     data = int.from_bytes(data, 'big')
     data *= 2
     server_socket.sendto(data.to_bytes(2, 'big'), address)
+    time.sleep(10)
