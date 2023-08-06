@@ -1,6 +1,6 @@
 import time
 import socket
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QLineEdit, QWidget
 from PyQt5.QtCore import QSize
 
 class UdpClient:
@@ -34,10 +34,29 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         self.setWindowTitle('UDP Client')
         self.setMinimumSize(QSize(480, 80))
+
+        self.value_label = QLabel('Enter a number to send to the server', self)
+        self.value_input = QLineEdit(self)
+
+        self.address_label = QLabel('Enter the server address', self)
+        self.address_input = QLineEdit(self)
         
         self.button = QPushButton('Send', self)
-        self.button.move(190, 20)
-        self.button.clicked.connect(self.client.send_message)
+        self.button.clicked.connect(self.on_click)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.value_label)
+        self.layout.addWidget(self.value_input)
+        self.layout.addWidget(self.address_label)
+        self.layout.addWidget(self.address_input)
+        self.layout.addWidget(self.button)
+
+        container = QWidget()
+        container.setLayout(self.layout)
+        self.setCentralWidget(container)
+    
+    def on_click(self):
+        self.client.send_message()
 
 
 
