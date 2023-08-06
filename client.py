@@ -26,6 +26,9 @@ class UdpClient:
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.client = UdpClient()
+
         self.setup_ui()
         
     def setup_ui(self):
@@ -34,6 +37,8 @@ class MainWindow(QMainWindow):
         
         self.button = QPushButton('Send', self)
         self.button.move(190, 20)
+        self.button.clicked.connect(self.client.send_message)
+
 
 
 app = QApplication([])
