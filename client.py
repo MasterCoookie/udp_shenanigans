@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
 
         self.address_label = QLabel('Enter the server address', self)
         self.address_input = QLineEdit(self)
+        self.address_input.setText('127.0.0.1')
 
         self.result_label = QLabel('Result: ', self)
         
@@ -66,10 +67,10 @@ class MainWindow(QMainWindow):
         self.result_label.setText(f'Result: {result}')
 
 
+if __name__ == '__main__':
+    app = QApplication([])
 
-app = QApplication([])
+    window = MainWindow()
+    window.show()
 
-window = MainWindow()
-window.show()
-
-app.exec_()
+    app.exec_()
