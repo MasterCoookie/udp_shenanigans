@@ -4,30 +4,32 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBo
 from PyQt5.QtCore import QSize, QObject, pyqtSignal, QThread
 
 class UdpClient(QObject):
-    finished = pyqtSignal(str)
+    finished = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.client_socket.settimeout(2.0)
+        self.results_queue = []
 
-    def send_message(self, _message, _addr):
+    def send_message(self):
         start = time.time()
 
-        addr = (_addr, 12000)
-        message = _message.to_bytes(2, 'big')
 
-        self.client_socket.sendto(message, addr)
-        result = ''
+        self.client_socket.sendto(self.message, self.addr)
         try:
             data, server = self.client_socket.recvfrom(1024)
             data = int.from_bytes(data, 'big')
             end = time.time()
             elapsed = end - start
-            result = f'{data} in {elapsed}s'
+            self.results_queue.append(f'{data} in {elapsed}s')
         except socket.timeout:
-            result = 'REQUEST TIMED OUT'
-        self.finished.emit(result)
+            self.results_queue.append('REQUEST TIMED OUT')
+        self.finished.emit()
+
+    def set_addr_msg(self, _addr, _message):
+        self.addr = (_addr, 12000)
+        self.message = _message.to_bytes(2, 'big')
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -65,8 +67,10 @@ class MainWindow(QMainWindow):
         container.setLayout(self.layout)
         self.setCentralWidget(container)
 
-    def on_finished(self, result):
+    def on_finished(self):
+        print("dupa")
         self.button.setEnabled(True)
+        result = self.client.results_queue.pop(0)
         self.result_label.setText(result)
     
     def on_click(self):
@@ -75,15 +79,19 @@ class MainWindow(QMainWindow):
         value = int(self.value_input.text())
         address = self.address_input.text()
 
+        self.client.set_addr_msg(address, value)
+
         self.thred = QThread()
         self.client.moveToThread(self.thred)
-        self.thred.started.connect(self.client.send_message, value, address)
-        self.thred.finished.connect(self.thred.quit)
-        self.client.finished.connect(self.client.deleteLater)
+
+        self.thred.started.connect(self.client.send_message)
+        self.thred.finished.connect(self.on_finished)
         self.thred.finished.connect(self.thred.deleteLater)
         self.thred.start()
 
-        self.thred.finished.connect(self.on_finished)
+        
+        self.client.finished.connect(self.thred.quit)
+        self.client.finished.connect(self.client.deleteLater)
 
     
 
