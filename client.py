@@ -35,8 +35,6 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.client = UdpClient()
-
         self.setup_ui()
         
     def setup_ui(self):
@@ -78,6 +76,8 @@ class MainWindow(QMainWindow):
         
         value = int(self.value_input.text())
         address = self.address_input.text()
+
+        self.client = UdpClient()
 
         self.client.set_addr_msg(address, value)
 
